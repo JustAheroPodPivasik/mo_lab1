@@ -37,18 +37,34 @@ namespace mo_lab1 {
             var a = A;
             var b = B;
             var iter = 0;
-            var phi = (1 + Sqrt(5)) / 2;
-            while (Math.Abs(b - a) > eps) {
-                iter++;
-                var x1 = b - (b - a) / phi;
-                var x2 = a + (b - a) / phi;
-                if (CalculateFunction(x1) >= CalculateFunction(x2)) {
+            var phi1 = ((3 - Sqrt(5.0)) / 2);
+            var phi2 = ((Sqrt(5.0) - 1) / 2);
+            var x1 = a + (b - a) * phi1;
+            var x2 = a + (b - a) * phi2;
+            var f1 = CalculateFunction(x1);
+            var f2 = CalculateFunction(x2);
+            iter += 2;
+            while (Math.Abs(a - b) > eps) {
+                
+                if (f1 > f2) {
                     a = x1;
+                    x1 = x2;
+                    f1 = f2;
+                    x2 = a + phi2 * (b - a);
+                    f2 = CalculateFunction(x2);
                 }
                 else {
                     b = x2;
+                    x2 = x1;
+                    f2 = f1;
+                    x1 = a + phi1 * (b - a);
+                    f1 = CalculateFunction(x1);
                 }
+
+                iter++;
             }
+
+            
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("GoldenSectionSearch:");
@@ -88,8 +104,9 @@ namespace mo_lab1 {
         }
 
         private static int Binet(int n) {
-            var phi = (1 + Sqrt(5)) / 2;
-            return (int) ((Pow(phi, n) - Pow(-phi, -n)) / (2 * phi - 1));
+            var phi1 = (1 + Sqrt(5)) / 2;
+            var phi2 = (1 - Sqrt(5)) / 2;
+            return (int) ((Pow(phi1, n) - Pow(phi2, n)) / (Sqrt(5)));
         }
 
         public static void Fibonacci(double eps) {
@@ -101,35 +118,37 @@ namespace mo_lab1 {
                 n++;
             }
 
-            var iter = n;
+            double fib2 = Binet(n + 2);
+            var iter = 0;
 
             var fib = new int[n + 1];
             for (var i = 1; i <= n; i++) {
                 fib[i] = Binet(i);
             }
 
-
-            var x1 = a + (b - a) * fib[n - 2] / fib[n];
-            var x2 = a + (b - a) * fib[n - 1] / fib[n];
-            var y1 = CalculateFunction(x1);
-            var y2 = CalculateFunction(x2);
-
-            while (n != 1) {
-                n--;
-                if (y1 > y2) {
+            var len = b - a;
+            var x1 = a + len * fib[n] / fib2;
+            var x2 = a + b - x1;
+            var f1 = CalculateFunction(x1);
+            var f2 = CalculateFunction(x2);
+            iter += 2;
+            for(int i = 2; i < n+2; i++) {
+                if (f1 > f2) {
                     a = x1;
                     x1 = x2;
-                    x2 = b - (x1 - a);
-                    y1 = y2;
-                    y2 = CalculateFunction(x2);
-                }
-                else {
+                    f1 = f2;
+                    x2 = a + (fib[n - i + 2] / fib2) * len; 
+                    f2 = CalculateFunction(x2);
+                } else {
                     b = x2;
                     x2 = x1;
-                    x1 = a + (b - x2);
-                    y2 = y1;
-                    y1 = CalculateFunction(x1);
+                    f2 = f1;
+		
+                    x1 = a + (fib[n - i + 1] / fib2) * len;
+                    f1 = CalculateFunction(x1);
                 }
+
+                iter++;
             }
             
             Console.ForegroundColor = ConsoleColor.Red;
